@@ -17,7 +17,7 @@ This is a side project to learn more about astronomy and have fun.
 
  ### Time Calculations
   - [ ] Sidereal Time
-  - [ ] Julian Date
+  - [x] Julian Date
 
  ### Planetary Positions
   - [ ] Keplar's Laws

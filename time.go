@@ -5,6 +5,16 @@ import (
 	"time"
 )
 
+func SideRealTime(date time.Time, lon float64) float64 {
+	jd := JulianDate(date)
+	centuries := (jd - 2451545.0) / 36525
+	gmst := 100.46061837 + 36000.770053608*centuries + 0.000387933*(centuries*centuries) - ((centuries * centuries * centuries) / 38710000)
+
+	lst := gmst + (lon / 15)
+
+	return lst
+}
+
 func JulianDate(date time.Time) float64 {
 	year := date.Year()
 	month := int(date.Month())
