@@ -14,18 +14,18 @@ func TestSiderealTime(t *testing.T) {
 	tests := []struct {
 		time time.Time
 		lon  float64
-		st   SiderealTimeResult
+		st   SiderealResult
 	}{
 		{
 			time.Date(2024, 9, 27, 23, 42, 56, 0, time.UTC),
 			-88.35146,
-			SiderealTimeResult{
-				LocalSiderealTime: LocalSiderealTime{
+			SiderealResult{
+				LocalSiderealTime: SiderealTime{
 					hh: 18,
 					mm: 18,
 					ss: 31,
 				},
-				GreenwichSiderealTime: GreenwichSiderealTime{
+				GreenwichSiderealTime: SiderealTime{
 					hh: 0,
 					mm: 11,
 					ss: 56,
@@ -35,13 +35,13 @@ func TestSiderealTime(t *testing.T) {
 		{
 			time.Date(2000, 1, 1, 9, 30, 0, 0, time.UTC),
 			-88.35146,
-			SiderealTimeResult{
-				LocalSiderealTime: LocalSiderealTime{
+			SiderealResult{
+				LocalSiderealTime: SiderealTime{
 					hh: 10,
 					mm: 18,
 					ss: 1,
 				},
-				GreenwichSiderealTime: GreenwichSiderealTime{
+				GreenwichSiderealTime: SiderealTime{
 					hh: 16,
 					mm: 11,
 					ss: 25,
@@ -52,7 +52,7 @@ func TestSiderealTime(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.time.String(), func(t *testing.T) {
-			st := SideRealTime(test.time, test.lon)
+			st := ConvertToST(test.time, test.lon)
 
 			if st.LocalSiderealTime != test.st.LocalSiderealTime {
 				t.Errorf("Expected %v, got %v", test.st.LocalSiderealTime, st.LocalSiderealTime)

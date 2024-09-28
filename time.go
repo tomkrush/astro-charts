@@ -14,12 +14,12 @@ type ST struct {
 	LSTss  int
 }
 
-type SiderealTimeResult struct {
-	LocalSiderealTime     LocalSiderealTime
-	GreenwichSiderealTime GreenwichSiderealTime
+type SiderealResult struct {
+	LocalSiderealTime     SiderealTime
+	GreenwichSiderealTime SiderealTime
 }
 
-type LocalSiderealTime struct {
+type SiderealTime struct {
 	hh int
 	mm int
 	ss int
@@ -31,7 +31,7 @@ type GreenwichSiderealTime struct {
 	ss int
 }
 
-func SideRealTime(date time.Time, lon float64) SiderealTimeResult {
+func ConvertToST(date time.Time, lon float64) SiderealResult {
 	jd := JulianDate(date)
 
 	LongDeg := math.Abs(lon)
@@ -60,13 +60,13 @@ func SideRealTime(date time.Time, lon float64) SiderealTimeResult {
 	LSTmm = math.Floor(LSTmm)
 	LSTss = math.Floor(LSTss)
 
-	return SiderealTimeResult{
-		LocalSiderealTime: LocalSiderealTime{
+	return SiderealResult{
+		LocalSiderealTime: SiderealTime{
 			hh: int(LSThh),
 			mm: int(LSTmm),
 			ss: int(LSTss),
 		},
-		GreenwichSiderealTime: GreenwichSiderealTime{
+		GreenwichSiderealTime: SiderealTime{
 			hh: int(GMSThh),
 			mm: int(GMSTmm),
 			ss: int(GMSTss),
