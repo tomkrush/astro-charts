@@ -5,12 +5,52 @@ import (
 	"time"
 )
 
-func SideRealTime(date time.Time, lon float64) float64 {
-	jd := JulianDate(date)
-	centuries := (jd - 2451545.0) / 36525
-	gmst := 100.46061837 + 36000.770053608*centuries + 0.000387933*(centuries*centuries) - ((centuries * centuries * centuries) / 38710000)
+type ST struct {
+	GMSThh int
+	GMSTmm int
+	GMSTss int
+	LSThh  int
+	LSTmm  int
+	LSTss  int
+}
 
-	lst := gmst + (lon / 15)
+func SideRealTime(date time.Time, lon float64) ST {
+	jd := JulianDate(date)
+
+	LongDeg := math.Abs(lon)
+	LongMin := (LongDeg - math.Floor(LongDeg)) * 60
+	LongSec := (LongMin - math.Floor(LongMin)) * 60
+	LongMin = math.Floor(LongMin)
+	LongSec = math.Floor(LongSec)
+
+	GMST := 18.697374558 + 24.06570982441908*(jd-2451545.0)
+	GMST = math.Mod(GMST, 24)
+	GMSTmm := (GMST - math.Floor(GMST)) * 60
+	GMSTss := (GMSTmm - math.Floor(GMSTmm)) * 60
+	GMSThh := math.Floor(GMST)
+	GMSTmm = math.Floor(GMSTmm)
+	GMSTss = math.Floor(GMSTss)
+
+	Long := lon / 15
+	LST := GMST + Long
+	if LST < 0 {
+		LST += 24
+	}
+
+	LSTmm := (LST - math.Floor(LST)) * 60
+	LSTss := (LSTmm - math.Floor(LSTmm)) * 60
+	LSThh := math.Floor(LST)
+	LSTmm = math.Floor(LSTmm)
+	LSTss = math.Floor(LSTss)
+
+	lst := ST{
+		GMSThh: int(GMSThh),
+		GMSTmm: int(GMSTmm),
+		GMSTss: int(GMSTss),
+		LSThh:  int(LSThh),
+		LSTmm:  int(LSTmm),
+		LSTss:  int(LSTss),
+	}
 
 	return lst
 }
