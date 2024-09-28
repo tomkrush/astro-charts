@@ -16,7 +16,7 @@ This is a side project to learn more about astronomy and have fun.
   - [ ] Horizontal Coordinate System
 
  ### Time Calculations
-  - [ ] Sidereal Time
+  - [x] Sidereal Time
   - [x] Julian Date
 
  ### Planetary Positions
