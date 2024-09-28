@@ -5,6 +5,56 @@ import (
 	"time"
 )
 
+type ST struct {
+	GMSThh int
+	GMSTmm int
+	GMSTss int
+	LSThh  int
+	LSTmm  int
+	LSTss  int
+}
+
+func SideRealTime(date time.Time, lon float64) ST {
+	jd := JulianDate(date)
+
+	LongDeg := math.Abs(lon)
+	LongMin := (LongDeg - math.Floor(LongDeg)) * 60
+	LongSec := (LongMin - math.Floor(LongMin)) * 60
+	LongMin = math.Floor(LongMin)
+	LongSec = math.Floor(LongSec)
+
+	GMST := 18.697374558 + 24.06570982441908*(jd-2451545.0)
+	GMST = math.Mod(GMST, 24)
+	GMSTmm := (GMST - math.Floor(GMST)) * 60
+	GMSTss := (GMSTmm - math.Floor(GMSTmm)) * 60
+	GMSThh := math.Floor(GMST)
+	GMSTmm = math.Floor(GMSTmm)
+	GMSTss = math.Floor(GMSTss)
+
+	Long := lon / 15
+	LST := GMST + Long
+	if LST < 0 {
+		LST += 24
+	}
+
+	LSTmm := (LST - math.Floor(LST)) * 60
+	LSTss := (LSTmm - math.Floor(LSTmm)) * 60
+	LSThh := math.Floor(LST)
+	LSTmm = math.Floor(LSTmm)
+	LSTss = math.Floor(LSTss)
+
+	lst := ST{
+		GMSThh: int(GMSThh),
+		GMSTmm: int(GMSTmm),
+		GMSTss: int(GMSTss),
+		LSThh:  int(LSThh),
+		LSTmm:  int(LSTmm),
+		LSTss:  int(LSTss),
+	}
+
+	return lst
+}
+
 func JulianDate(date time.Time) float64 {
 	year := date.Year()
 	month := int(date.Month())
