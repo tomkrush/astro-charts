@@ -53,3 +53,33 @@ func TestDECToDegrees(t *testing.T) {
 		})
 	}
 }
+
+// convert from eqatorial to horizontal coordinates
+func TestEquatorialToHorizontal(t *testing.T) {
+	// testing table
+	tests := []struct {
+		equatorialCoordinates EquatorialCoordinates
+		observer              ObserverCoordinates
+	}{
+		{
+			equatorialCoordinates: EquatorialCoordinates{
+				RightAscension: 18.739,
+				Declination:    38.7836,
+			},
+			observer: ObserverCoordinates{
+				Latitude:  37.7749,
+				Longitude: -122.4194,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("EquatorialToHorizontal", func(t *testing.T) {
+			horizontal := EquatorialToHorizontal(test.equatorialCoordinates, test.observer)
+
+			if horizontal.Azimuth == 0 && horizontal.Altitude == 0 {
+				t.Errorf("Expected non-zero values, got %v", horizontal)
+			}
+		})
+	}
+}

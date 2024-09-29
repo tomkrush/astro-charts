@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-type EquatorialCoordinate interface {
-	RightAscension() float64
-	Declination() float64
-}
-
 type Star struct {
 	BV            string `json:"B-V"`
 	Dm            string `json:"DM"`
@@ -48,6 +43,13 @@ type Star struct {
 	NRadVel     string `json:"n_RadVel"`
 	PmDE        string `json:"pmDE"`
 	PmRA        string `json:"pmRA"`
+}
+
+func (s Star) Equatorial() EquatorialCoordinates {
+	return EquatorialCoordinates{
+		RightAscension: s.RightAscension(),
+		Declination:    s.Declination(),
+	}
 }
 
 func ParseHours(hours string) float64 {
@@ -93,6 +95,26 @@ func (s Star) Declination() float64 {
 	return ParseDegrees(s.Dec)
 }
 
+type EquatorialCoordinates struct {
+	RightAscension float64
+	Declination    float64
+}
+
+type HorizontalCoordinates struct {
+	Azimuth  float64
+	Altitude float64
+}
+
+type ObserverCoordinates struct {
+	Latitude  float64
+	Longitude float64
+}
+
+func EquatorialToHorizontal(e EquatorialCoordinates, observer ObserverCoordinates) HorizontalCoordinates {
+
+	return HorizontalCoordinates{}
+}
+
 func main() {
 	// Read the file
 	file, err := os.Open("data/bsc5.json")
@@ -115,6 +137,8 @@ func main() {
 
 	// Print the stars
 	for _, star := range stars {
-		fmt.Printf("RA: %.2f, DEC: %.2f, Vmag: %s\n", star.RightAscension(), star.Declination(), star.Vmag)
+		e := star.Equatorial()
+
+		fmt.Printf("RA: %.2f, DEC: %.2f, Vmag: %s\n", e.RightAscension, e.Declination, star.Vmag)
 	}
 }
