@@ -115,6 +115,6 @@ func main() {
 
 	// Print the stars
 	for _, star := range stars {
-		fmt.Println(star.Dec, star.Ra, star.Vmag)
+		fmt.Printf("RA: %.2f, DEC: %.2f, Vmag: %s\n", star.RightAscension(), star.Declination(), star.Vmag)
 	}
 }
