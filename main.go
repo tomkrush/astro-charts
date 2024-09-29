@@ -1,66 +1,120 @@
 package main
 
 import (
-	"encoding/binary"
+	"encoding/json"
 	"fmt"
-	"math"
 	"os"
+	"regexp"
+	"strconv"
 )
 
-// Main catalog header
-type CatalogHeader struct {
-	Star0 int32
-	Star1 int32
-	StarN int32
-	StNum int32
-	MProp int32
-	NMag  int32
-	NBEnt int32
+type EquatorialCoordinate interface {
+	RightAscension() float64
+	Declination() float64
 }
 
-func (c CatalogHeader) numberOfStars() int {
-	return int(math.Abs(float64(c.StarN)))
+type Star struct {
+	BV            string `json:"B-V"`
+	Dm            string `json:"DM"`
+	Dec           string `json:"Dec"`
+	Dmag          string `json:"Dmag"`
+	Fk5           string `json:"FK5"`
+	Glat          string `json:"GLAT"`
+	Glon          string `json:"GLON"`
+	Hd            string `json:"HD"`
+	Hr            string `json:"HR"`
+	IRflag        string `json:"IRflag"`
+	K             string `json:"K"`
+	LuminosityCls string `json:"LuminosityCls"`
+	MultCnt       string `json:"MultCnt"`
+	Name          string `json:"Name"`
+	NoteFlag      string `json:"NoteFlag"`
+	Notes         []struct {
+		Category string `json:"Category"`
+		Remark   string `json:"Remark"`
+	} `json:"Notes"`
+	Parallax    string `json:"Parallax"`
+	RI          string `json:"R-I"`
+	Ra          string `json:"RA"`
+	RadVel      string `json:"RadVel"`
+	RotVel      string `json:"RotVel"`
+	Sao         string `json:"SAO"`
+	Sep         string `json:"Sep"`
+	SpectralCls string `json:"SpectralCls"`
+	UB          string `json:"U-B"`
+	VarID       string `json:"VarID"`
+	Vmag        string `json:"Vmag"`
+	LRotVel     string `json:"l_RotVel"`
+	NRadVel     string `json:"n_RadVel"`
+	PmDE        string `json:"pmDE"`
+	PmRA        string `json:"pmRA"`
 }
 
-// Each star entry
-type StarEntry struct {
-	CatalogNumber int32   // Optional
-	SRA0          float64 // Right Ascension (radians)
-	SDEC0         float64 // Declination (radians)
-	ISP           string  // Spectral type (2 characters)
-	Magnitude     []int16 // V Magnitude * 100
-	XRPM          float32 // R.A. proper motion (radians/year)
-	XDPM          float32 // Dec. proper motion (radians/year)
-	SVEL          float64 // Radial velocity (km/s)
-	ObjectName    string  // Optional, length -StNum
+func ParseHours(hours string) float64 {
+	reg := regexp.MustCompile(`(\d+)h (\d+)m (\d+\.\d+)s`)
+	matches := reg.FindStringSubmatch(hours)
+
+	if len(matches) != 4 {
+		return 0
+	}
+
+	h, _ := strconv.ParseFloat(matches[1], 64)
+	m, _ := strconv.ParseFloat(matches[2], 64)
+	s, _ := strconv.ParseFloat(matches[3], 64)
+
+	return h + m/60 + s/3600
+}
+
+func ParseDegrees(degrees string) float64 {
+	reg := regexp.MustCompile(`([+-])(\d+)° (\d+)′ (\d+)″`)
+	matches := reg.FindStringSubmatch(degrees)
+
+	if len(matches) != 5 {
+		return 0
+	}
+
+	sign := 1.0
+	if matches[1] == "-" {
+		sign = -1.0
+	}
+
+	d, _ := strconv.ParseFloat(matches[2], 64)
+	m, _ := strconv.ParseFloat(matches[3], 64)
+	s, _ := strconv.ParseFloat(matches[4], 64)
+
+	return sign * (d + m/60 + s/3600)
+}
+
+func (s Star) RightAscension() float64 {
+	return ParseHours(s.Ra)
+}
+
+func (s Star) Declination() float64 {
+	return ParseDegrees(s.Dec)
 }
 
 func main() {
-	// Open the file
-	file, err := os.Open("data/BSC5")
+	// Read the file
+	file, err := os.Open("data/bsc5.json")
+
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
+		fmt.Println(err)
 	}
+
 	defer file.Close()
 
-	// read the first 28 bytes
-	header := CatalogHeader{}
-	err = binary.Read(file, binary.LittleEndian, &header)
+	// Decode the JSON
+	decoder := json.NewDecoder(file)
 
-	for i := 0; i < header.numberOfStars(); i++ {
-		starBytes := make([]byte, header.NBEnt)
-		_, err = file.Read(starBytes)
+	var stars []Star
+	err = decoder.Decode(&stars)
 
-		// star := StarEntry{}
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		fmt.Println(starBytes)
-
-		// reader := bytes.NewReader(starBytes)
-		// err = binary.Read(reader, binary.LittleEndian, &star)
-
-		// fmt.Println(star)
-
-		break
+	// Print the stars
+	for _, star := range stars {
+		fmt.Println(star.Dec, star.Ra, star.Vmag)
 	}
 }
