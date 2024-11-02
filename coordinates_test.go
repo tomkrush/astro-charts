@@ -45,6 +45,10 @@ func TestDECToDegrees(t *testing.T) {
 			dec:     "+38° 47′ 01″",
 			degrees: 38.7836,
 		},
+		{
+			dec:     "+7° 30′ 00″",
+			degrees: 7.5,
+		},
 	}
 
 	for _, test := range tests {
